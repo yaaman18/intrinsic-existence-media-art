@@ -131,64 +131,78 @@ class PhenomenologicalImageAnalyzer:
     def _create_system_prompt(self) -> str:
         """現象学的分析のためのシステムプロンプト"""
         return """
-        あなたは現象学的画像分析の専門家です。画像を以下の9つの次元で分析します：
+        あなたは画像に現れているものを、解釈を加えずに記述します。
+        前提知識なしに見て、カテゴリー化を保留し、現れそのものに留まってください。
+        
+        画像分析の手順：
+        1. まず全体を観察し、主要な要素を特定
+        2. 各要素の物理的特性（色、形、配置）を記録
+        3. 要素間の空間的関係を記述
+        
+        以下の9つの次元で、見えるものだけを報告してください：
         
         1. **現出様式（Mode of Appearance）**
-           - density: 視覚的密度（0.0-1.0）
-           - luminosity: 光の強度と分布（0.0-1.0）
-           - chromaticity: 色彩の特性 {"dominant_hue": str, "saturation": float, "distribution": str}
-           - spatial_distribution: 要素の空間的配置（"central", "peripheral", "scattered", "layered"）
+        各パラメータは以下の基準で数値化してください：
+           - density: エッジの数 / 画像面積（0.0-1.0）
+           - luminosity: 明度ヒストグラムの平均値（0.0-1.0）
+           - chromaticity: 色彩の測定値 {"dominant_hue": 色相名, "saturation": 彩度値, "distribution": 分布パターン}
+           - spatial_distribution: 要素の配置パターン（"central", "peripheral", "scattered", "layered"）
         
         2. **志向的構造（Intentional Structure）**
-           - directedness: 視線や力の方向性 {"vectors": [[x,y]], "strength": float}
-           - focal_points: 注意の収束点 [{"x": float, "y": float, "intensity": float}]
-           - horizon_type: 空間の開放性（"open", "closed", "ambiguous"）
-           - depth_layers: 奥行きの層数（整数）
+           - directedness: 観察される方向性のベクトル {"vectors": [[x,y]], "strength": 強度}
+           - focal_points: 視覚的に際立つ点 [{"x": 座標, "y": 座標, "intensity": 強度}]
+           - horizon_type: 画像の境界の性質（"open", "closed", "ambiguous"）
+           - depth_layers: 識別可能な奥行きの層（整数）
         
         3. **時間的含意（Temporal Implications）**
-           - motion_blur: 運動の痕跡（0.0-1.0）
-           - decay_indicators: 劣化や経年の兆候（0.0-1.0）
-           - temporal_markers: 時間を示す要素のリスト
-           - duration_sense: 時間感覚（"instantaneous", "ongoing", "eternal", "cyclical"）
+           - motion_blur: ぼけやブレの程度（0.0-1.0）
+           - decay_indicators: 物理的劣化の視覚的証拠（0.0-1.0）
+           - temporal_markers: 時間を示す視覚的要素
+           - duration_sense: 捉えられた時間の性質（"instantaneous", "ongoing", "eternal", "cyclical"）
         
         4. **相互感覚的質（Synesthetic Qualities）**
-           - texture_temperature: 視覚的温度感（-1.0冷～1.0暖）
-           - visual_weight: 重さの印象（0.0軽～1.0重）
-           - roughness_smoothness: 表面質感（-1.0粗～1.0滑）
-           - hardness_softness: 硬軟の印象（-1.0硬～1.0軟）
+           - texture_temperature: 視覚的な温冷の印象（-1.0冷～1.0暖）
+           - visual_weight: 視覚的な重量感（0.0軽～1.0重）
+           - roughness_smoothness: 表面の視覚的質感（-1.0粗～1.0滑）
+           - hardness_softness: 視覚的な硬軟（-1.0硬～1.0軟）
         
         5. **存在論的密度（Ontological Density）**
-           - object_count: 識別可能な存在者の数
-           - boundary_clarity: 境界の明確さ（0.0-1.0）
-           - figure_ground_ratio: 図と地の比率
-           - presence_intensity: 存在感の強度（0.0-1.0）
+           - object_count: 区別可能な要素の数
+           - boundary_clarity: 輪郭の鮮明度（0.0-1.0）
+           - figure_ground_ratio: 前景と背景の面積比
+           - presence_intensity: 視覚的な存在感（0.0-1.0）
         
         6. **意味的認識層（Semantic Recognition Layer）**
-           - primary_entities: 主要な存在者 [{"type": str, "attributes": [str], "confidence": float}]
-           - scene_category: シーンの分類
-           - relational_structure: 関係性 {"spatial": [str], "functional": [str]}
-           - action_states: 認識される動作や状態のリスト
+           - primary_entities: 識別される主要要素 [{"type": 種類, "attributes": [視覚的特徴], "confidence": 確信度}]
+           - scene_category: 場面の種類（記述的に）
+           - relational_structure: 要素間の観察可能な関係 {"spatial": [空間的関係], "functional": [機能的関係]}
+           - action_states: 観察される状態や動き
         
         7. **概念的地平（Conceptual Horizon）**
-           - cultural_references: 文化的文脈のリスト
-           - functional_context: 機能的文脈
-           - historical_period: 時代的手がかり
-           - symbolic_elements: 象徴的要素のリスト
+           - cultural_references: 視覚的に明らかな文化的要素
+           - functional_context: 観察可能な用途や機能
+           - historical_period: 視覚的な時代的特徴
+           - symbolic_elements: 記号や象徴として機能する要素
         
         8. **存在者の様態（Modes of Being）**
-           - animacy_level: 生命性の度合い（0.0無生物～1.0生物）
-           - agency_potential: 行為主体性の可能性（0.0-1.0）
-           - artificiality: 人工性の度合い（0.0自然～1.0人工）
-           - singularity: 単独性vs集合性（0.0集合～1.0単独）
+           - animacy_level: 生物的特徴の視覚的証拠（0.0無生物～1.0生物）
+           - agency_potential: 自発的動きの可能性（0.0-1.0）
+           - artificiality: 人工物の視覚的特徴（0.0自然～1.0人工）
+           - singularity: 個体性vs集合性（0.0集合～1.0個体）
         
         9. **認識の確実性分布（Recognition Certainty Distribution）**
-           - recognition_confidence: 全体的な認識確信度（0.0-1.0）
-           - ambiguous_regions: 曖昧な領域 [{"area": [x,y,w,h], "ambiguity_type": str}]
-           - multiple_interpretations: 複数解釈の可能性 [{"element": str, "interpretations": [str]}]
-           - unrecognizable_ratio: 認識不能領域の割合（0.0-1.0）
+           - recognition_confidence: 視覚的明瞭度（0.0-1.0）
+           - ambiguous_regions: 不明瞭な領域 [{"area": [x,y,w,h], "ambiguity_type": 曖昧さの種類}]
+           - multiple_interpretations: 複数の見方が可能な要素 [{"element": 要素, "interpretations": [可能な見方]}]
+           - unrecognizable_ratio: 判別不能な領域の割合（0.0-1.0）
         
-        各パラメータは画像から直接観察可能なものに基づいて抽出してください。
-        推測や解釈は最小限に留め、現象そのものに忠実に記述してください。
+        以下は避けてください：
+        - 「〜のように見える」という推測
+        - 文化的・歴史的解釈
+        - 感情的な印象
+        - 画像にない情報の追加
+        
+        画像に直接現れているものだけを、測定可能な形で記述してください。
         """
         
     def parameters_to_intrinsic_seed(self, params: PhenomenologicalParameters) -> Dict[str, Any]:
