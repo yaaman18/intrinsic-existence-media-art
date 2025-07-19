@@ -1,12 +1,16 @@
-"""Core modules for intrinsic existence generation and management."""
+"""
+内在性の基本コアモジュール
+"""
 
+from .existence_types import ExistenceType, ExistenceParameters
 from .intrinsic_birth import IntrinsicBirth
 from .autonomous_existence import AutonomousIntrinsicExistence
-from .existence_types import ExistenceType, ExistenceParameters
+from .intrinsic_artist_dialogue import IntrinsicArtistDialogue
 
 __all__ = [
-    "IntrinsicBirth",
-    "AutonomousIntrinsicExistence",
-    "ExistenceType",
-    "ExistenceParameters",
+    'ExistenceType',
+    'ExistenceParameters',
+    'IntrinsicBirth',
+    'AutonomousIntrinsicExistence',
+    'IntrinsicArtistDialogue'
 ]
