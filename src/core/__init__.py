@@ -6,11 +6,14 @@ from .existence_types import ExistenceType, ExistenceParameters
 from .intrinsic_birth import IntrinsicBirth
 from .autonomous_existence import AutonomousIntrinsicExistence
 from .intrinsic_artist_dialogue import IntrinsicArtistDialogue
+from .phenomenological_analyzer import PhenomenologicalImageAnalyzer, PhenomenologicalParameters
 
 __all__ = [
     'ExistenceType',
     'ExistenceParameters',
     'IntrinsicBirth',
     'AutonomousIntrinsicExistence',
-    'IntrinsicArtistDialogue'
+    'IntrinsicArtistDialogue',
+    'PhenomenologicalImageAnalyzer',
+    'PhenomenologicalParameters'
 ]
