@@ -8,6 +8,7 @@ from .autonomous_existence import AutonomousIntrinsicExistence
 from .intrinsic_artist_dialogue import IntrinsicArtistDialogue
 from .phenomenological_analyzer import PhenomenologicalImageAnalyzer, PhenomenologicalParameters
 from .direct_intrinsic_birth import DirectIntrinsicBirth
+from .phenomenological_oracle_v5 import PhenomenologicalOracleSystem, EditingOracle
 
 __all__ = [
     'ExistenceType',
@@ -17,5 +18,7 @@ __all__ = [
     'IntrinsicArtistDialogue',
     'PhenomenologicalImageAnalyzer',
     'PhenomenologicalParameters',
-    'DirectIntrinsicBirth'
+    'DirectIntrinsicBirth',
+    'PhenomenologicalOracleSystem',
+    'EditingOracle'
 ]
