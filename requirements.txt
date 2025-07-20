@@ -1,0 +1,28 @@
+# Project Five Axioms: Intrinsic Existence
+# Python Dependencies
+
+# Core Dependencies (必須)
+openai>=1.0.0          # GPT-4 Vision API for consciousness generation
+pyphi>=1.2.0           # Integrated Information Theory implementation
+Pillow>=10.0.0         # Image processing and encoding
+python-dotenv>=1.0.0   # Environment variable management
+
+# Data Management
+pydantic>=2.0.0        # Data validation and type checking
+
+# Logging & Development Tools
+loguru>=0.7.0          # Advanced logging with rotation
+rich>=13.0.0           # Beautiful terminal output and progress bars
+
+# Note: The following are automatically installed as dependencies:
+# - numpy (via pyphi) - Numerical computations
+# - scipy (via pyphi) - Scientific computing
+# - networkx (via pyphi) - Graph computations
+
+# Optional Libraries (uncomment as needed)
+# opencv-python>=4.8.0   # Advanced image processing
+# watchdog>=3.0.0        # File system monitoring for automated processing
+# aiohttp>=3.9.0         # Async HTTP for parallel processing
+# sqlalchemy>=2.0.0      # Database ORM for history management
+# fastapi>=0.104.0       # API framework for future web interface
+# uvicorn>=0.24.0        # ASGI server for FastAPI
