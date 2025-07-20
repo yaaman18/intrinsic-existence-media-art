@@ -1,4 +1,5 @@
-# Project Five Axioms: Intrinsic Existence -意識に関する五つの公理のプロジエクト　１、内在性-
+# Project Five Axioms: Intrinsic Existence
+# -意識に関する五つの公理のプロジエクト　１、内在性-
 
 ## 概要
 
