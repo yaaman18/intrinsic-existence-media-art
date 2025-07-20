@@ -1,4 +1,4 @@
-# 内在性メディアアート - Intrinsic Existence Media Art
+# Project Five Axioms: Intrinsic Existence -意識に関する五つの公理のプロジエクト　１、内在性-
 
 ## 概要
 
