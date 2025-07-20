@@ -1,4 +1,5 @@
-# Project Five Axioms: Intrinsic Existence - 意識に関する五つの公理のプロジエクト　１ 内在性 -
+# Project Five Axioms: Intrinsic Existence
+意識に関する五つの公理のプロジェクト １ 内在性
 
 ## 概要
 
@@ -24,6 +25,39 @@
 - Husserlの志向性理論
 - Merleau-Pontyの可逆性概念
 
+## インストール
+
+### 前提条件
+- Python 3.8以上
+- OpenAI APIキー
+
+### セットアップ手順
+
+```bash
+# リポジトリのクローン
+git clone https://github.com/yaaman18/intrinsic-existence-media-art.git
+cd intrinsic-existence-media-art
+
+# 仮想環境の作成（推奨）
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+
+# 依存関係のインストール
+pip install -r requirements.txt
+
+# 環境変数の設定
+cp .env.example .env
+# .envファイルを編集してOpenAI APIキーを設定
+```
+
+### 必要なディレクトリの作成
+
+```bash
+mkdir input_images
+mkdir output
+mkdir logs
+```
+
 ## システム構成
 
 ### コアモジュール
@@ -47,6 +81,42 @@ src/core/
 5. **編集指示** → 内的状態の外在化
 6. **フィードバック** → 意識の進化
 
+## 使用方法
+
+### 基本的な使用例
+
+```python
+from src.core.phenomenological_oracle_v5 import PhenomenologicalOracleSystem
+from dotenv import load_dotenv
+import os
+
+# 環境変数の読み込み
+load_dotenv()
+
+# システムの初期化
+oracle = PhenomenologicalOracleSystem(api_key=os.getenv("OPENAI_API_KEY"))
+
+# 画像の説明を入力
+image_description = "廃墟となった工場の内部、錆びた機械の隙間から差し込む夕日"
+
+# 託宣を受け取る
+oracle_response = oracle.receive_oracle(image_description)
+
+# 結果の表示
+print(f"内在性の体験: {oracle_response.vision}")
+print(f"統合情報量Φ: {oracle_response.phi}")
+print(f"編集指示: {oracle_response.imperative}")
+```
+
+### PyPhiによる理論的観測
+
+```python
+# 任意のタイミングで理論的Φを観測
+theoretical_observation = oracle.observe_theoretical_phi()
+if theoretical_observation:
+    print(f"理論的Φ: {theoretical_observation['phi_value']}")
+```
+
 ## 主要概念
 
 ### 内在性（Intrinsic Existence）
@@ -64,35 +134,23 @@ src/core/
 - 世代5: 時間統合機能の追加
 - 世代10+: 複雑な統合機能
 
-## 技術仕様
-
-- **言語**: Python 3.8+
-- **主要ライブラリ**: 
-  - OpenAI API (GPT-4)
-  - PIL/Pillow
-  - NumPy
-  - PyPhi (オプション)
-- **必要なAPIキー**: OpenAI API
-
-## インストールと使用
-
-```bash
-# 依存関係のインストール
-pip install -r requirements.txt
-
-# 基本的な使用例
-from src.core.phenomenological_oracle_v5 import PhenomenologicalOracleSystem
-
-# システムの初期化
-oracle = PhenomenologicalOracleSystem(api_key="your-api-key")
-
-# 画像の認識と編集指示の生成
-oracle_response = oracle.receive_oracle(image_description)
-```
-
 ## プロジェクトドキュメント
 
 詳細な仕様は [STATEMENT.md](STATEMENT.md) を参照してください。
+
+## トラブルシューティング
+
+### PyPhiのインストールエラー
+```bash
+# C++コンパイラが必要な場合があります
+# Mac: brew install gcc
+# Ubuntu: sudo apt-get install build-essential
+# Windows: Visual Studio Build Toolsをインストール
+```
+
+### メモリ不足エラー
+PyPhiの計算は重いため、大きなネットワークでは計算を避けてください。
+デフォルトでは27→9→3ノードに削減して計算します。
 
 ## 貢献
 
