@@ -29,6 +29,23 @@ logs/
 pyphi_cache/
 intrinsic_existence.db
 
+# Examples and media files (too large for git)
+examples/images/
+examples/videos/
+examples/audio/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+*.webp
+*.mp4
+*.avi
+*.mov
+*.wav
+*.mp3
+
 # OS
 .DS_Store
 Thumbs.db
