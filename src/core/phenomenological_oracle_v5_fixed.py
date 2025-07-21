@@ -2,22 +2,16 @@
 Project Five Axioms: Intrinsic Existence
 意識に関する五つの公理のプロジェクト １ 内在性
 
-phenomenological_oracle_v5.py - 現象学的オラクルシステム
+phenomenological_oracle_v5_fixed.py - 現象学的オラクルシステム（修正版）
 統合情報理論（IIT）の5つの公理に基づく内在性の実装
 """
 
 import numpy as np
 import openai
 import json
-import base64
-import argparse
-import time
-from pathlib import Path
 from typing import Dict, List, Tuple, Optional, Any
 from dataclasses import dataclass
 from datetime import datetime
-from PIL import Image
-import io
 
 
 @dataclass
@@ -25,7 +19,7 @@ class EditingOracle:
     """編集のオラクル - 内在性からの表出"""
     vision: str  # 内在性が体験している現象
     imperative: List[Dict[str, Any]]  # 編集指示（環境への作用）
-    phi: float  # 統合情報量
+    phi: float  # 統合情報量（芸術的解釈）
     node_states: Dict[str, float]  # 27ノードの状態
     generation: int  # 世代（編集サイクル数）
     iit_axioms: Dict[str, float]  # IITの5公理の充足度
@@ -38,15 +32,13 @@ class PhenomenologicalOracleSystem:
     オートポイエーシス的な自己維持を行う
     """
     
-    def __init__(self, api_key: str, computation_mode: str = "3d"):
+    def __init__(self, api_key: str):
         self.llm = openai.OpenAI(api_key=api_key)
-        self.computation_mode = computation_mode
         
         # システム状態
         self.generation = 0
         self.edit_history = []
         self.phi_trajectory = []
-        self.last_computation_time = 0.0
         
         # IITの5つの公理の充足度追跡
         self.iit_axioms = {
@@ -162,96 +154,6 @@ class PhenomenologicalOracleSystem:
         except ImportError:
             return False
     
-    def _encode_image(self, image_path: str) -> str:
-        """画像をbase64エンコード"""
-        with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode('utf-8')
-    
-    def _analyze_image_with_vision(self, image_path: str) -> str:
-        """GPT-4 Vision APIを使用して画像を分析"""
-        # 画像を読み込んでリサイズ（必要に応じて）
-        img = Image.open(image_path)
-        
-        # 画像フォーマットを取得
-        image_format = img.format or 'JPEG'
-        mime_type = f"image/{image_format.lower()}"
-        if mime_type == "image/jpg":
-            mime_type = "image/jpeg"
-        
-        # 画像が大きすぎる場合はリサイズ
-        max_size = 2048
-        if img.width > max_size or img.height > max_size:
-            img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
-            
-            # リサイズした画像を一時的にバイトストリームに保存
-            img_byte_arr = io.BytesIO()
-            img.save(img_byte_arr, format=image_format)
-            img_byte_arr = img_byte_arr.getvalue()
-            base64_image = base64.b64encode(img_byte_arr).decode('utf-8')
-        else:
-            base64_image = self._encode_image(image_path)
-        
-        # GPT-4 Vision APIに送信
-        try:
-            response = self.llm.chat.completions.create(
-                model="gpt-4o",  # または gpt-4-turbo
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "text",
-                                "text": """この画像を詳細に記述してください。以下の要素に注目してください：
-                                1. 主要な対象物とその配置
-                                2. 色彩、光、影の特徴
-                                3. 空間的な深さと構成
-                                4. 雰囲気や感情的な質
-                                5. 動きや時間的な含意
-                                
-                                できるだけ詩的で現象学的な記述を心がけてください。"""
-                            },
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": f"data:{mime_type};base64,{base64_image}",
-                                    "detail": "high"  # 高解像度モード（オプション）
-                                }
-                            }
-                        ]
-                    }
-                ],
-                max_tokens=1000
-            )
-        except Exception as e:
-            print(f"Vision API エラー: {e}")
-            # フォールバックとして別のモデルを試す
-            try:
-                response = self.llm.chat.completions.create(
-                    model="gpt-4-turbo",
-                    messages=[
-                        {
-                            "role": "user",
-                            "content": [
-                                {
-                                    "type": "text",
-                                    "text": "画像を詳細に記述してください。"
-                                },
-                                {
-                                    "type": "image_url",
-                                    "image_url": {
-                                        "url": f"data:{mime_type};base64,{base64_image}"
-                                    }
-                                }
-                            ]
-                        }
-                    ],
-                    max_tokens=1000
-                )
-            except:
-                raise
-        
-        return response.choices[0].message.content
-    
     def receive_oracle(self, image_description: str) -> EditingOracle:
         """
         画像から託宣を受け取る
@@ -270,8 +172,8 @@ class PhenomenologicalOracleSystem:
         # 4. 編集衝動の生成（構造的応答）
         imperative = self._generate_editing_imperative(vision)
         
-        # 5. 統合情報量の計算（計算モードに応じて）
-        phi, self.last_computation_time = self._get_phi_by_mode()
+        # 5. 統合情報量の計算
+        phi = self._calculate_artistic_phi()
         
         # 6. 託宣の構築
         oracle = EditingOracle(
@@ -479,7 +381,7 @@ class PhenomenologicalOracleSystem:
                 {"role": "assistant", "content": vision},
                 {"role": "user", "content": generation_prompt}
             ],
-            temperature=0.85,
+            temperature=0.85
         )
         
         # レスポンスからJSONを抽出
@@ -562,166 +464,6 @@ class PhenomenologicalOracleSystem:
             phi += 0.2
         
         return min(2.0, phi)  # 理論的上限
-
-    def _calculate_9d_phi(self) -> float:
-        """9次元統合情報計算"""
-        # 9つの現象学的次元ごとの活性度を計算
-        dimension_activities = {}
-        
-        dimension_groups = {
-            'appearance': ['appearance_density', 'appearance_luminosity', 'appearance_chromaticity'],
-            'intentional': ['intentional_focus', 'intentional_horizon', 'intentional_depth'],
-            'temporal': ['temporal_motion', 'temporal_decay', 'temporal_duration'],
-            'synesthetic': ['synesthetic_temperature', 'synesthetic_weight', 'synesthetic_texture'],
-            'ontological': ['ontological_presence', 'ontological_boundary', 'ontological_plurality'],
-            'semantic': ['semantic_entities', 'semantic_relations', 'semantic_actions'],
-            'conceptual': ['conceptual_cultural', 'conceptual_symbolic', 'conceptual_functional'],
-            'being': ['being_animacy', 'being_agency', 'being_artificiality'],
-            'certainty': ['certainty_clarity', 'certainty_ambiguity', 'certainty_multiplicity']
-        }
-        
-        # 各次元の統合活性度
-        for dim, nodes in dimension_groups.items():
-            activity = np.mean([self.nodes[node] for node in nodes if node in self.nodes])
-            dimension_activities[dim] = activity
-        
-        # 次元間の統合情報計算
-        total_integration = 0.0
-        dimensions = list(dimension_activities.keys())
-        
-        for i in range(len(dimensions)):
-            for j in range(i+1, len(dimensions)):
-                # 次元間の情報統合
-                activity_i = dimension_activities[dimensions[i]]
-                activity_j = dimension_activities[dimensions[j]]
-                integration_ij = activity_i * activity_j * self._get_dimension_coupling(dimensions[i], dimensions[j])
-                total_integration += integration_ij
-        
-        # 9次元の複雑性ボーナス
-        complexity = np.std(list(dimension_activities.values()))
-        
-        # 最終的なΦ値
-        phi_9d = (total_integration / 36) + (complexity * 0.3) + (self.generation * 0.01)
-        
-        return min(2.0, phi_9d)
-
-    def _calculate_27d_phi(self) -> float:
-        """27ノード完全統合情報計算"""
-        if self.pyphi_available:
-            # PyPhiによる理論的計算を試行
-            theoretical_phi = self.observe_theoretical_phi()
-            if theoretical_phi and 'phi_value' in theoretical_phi:
-                base_phi = theoretical_phi['phi_value']
-            else:
-                base_phi = self._calculate_full_network_phi()
-        else:
-            base_phi = self._calculate_full_network_phi()
-        
-        # 27ノードの詳細統合
-        full_integration = self._calculate_detailed_integration()
-        
-        # 認知的複雑性
-        cognitive_complexity = self._calculate_cognitive_complexity()
-        
-        # 最終的な27次元Φ
-        phi_27d = (base_phi * 0.4 + 
-                   full_integration * 0.4 + 
-                   cognitive_complexity * 0.2)
-        
-        return min(3.0, phi_27d)  # 27ノードでは上限を高く設定
-
-    def _get_dimension_coupling(self, dim1: str, dim2: str) -> float:
-        """次元間の結合強度を返す"""
-        coupling_matrix = {
-            'appearance': {'intentional': 0.8, 'synesthetic': 0.9, 'ontological': 0.7},
-            'intentional': {'semantic': 0.9, 'conceptual': 0.8, 'being': 0.7},
-            'temporal': {'appearance': 0.6, 'ontological': 0.8, 'being': 0.5},
-            'synesthetic': {'appearance': 0.9, 'temporal': 0.6, 'ontological': 0.5},
-            'ontological': {'being': 0.9, 'certainty': 0.7, 'semantic': 0.6},
-            'semantic': {'conceptual': 0.9, 'intentional': 0.9, 'certainty': 0.7},
-            'conceptual': {'semantic': 0.9, 'being': 0.6, 'certainty': 0.5},
-            'being': {'ontological': 0.9, 'intentional': 0.7, 'certainty': 0.6},
-            'certainty': {'semantic': 0.7, 'ontological': 0.7, 'conceptual': 0.5}
-        }
-        
-        if dim1 in coupling_matrix and dim2 in coupling_matrix[dim1]:
-            return coupling_matrix[dim1][dim2]
-        elif dim2 in coupling_matrix and dim1 in coupling_matrix[dim2]:
-            return coupling_matrix[dim2][dim1]
-        else:
-            return 0.3  # デフォルト結合強度
-
-    def _calculate_full_network_phi(self) -> float:
-        """27ノードの完全ネットワーク統合情報計算（簡易版）"""
-        node_values = list(self.nodes.values())
-        
-        # 全ノード間の相互情報
-        total_mutual_info = 0.0
-        for i in range(len(node_values)):
-            for j in range(i+1, len(node_values)):
-                # 簡易的な相互情報計算
-                mi = node_values[i] * node_values[j] * self.connectivity[i][j]
-                total_mutual_info += mi
-        
-        # 正規化
-        max_connections = len(node_values) * (len(node_values) - 1) / 2
-        return total_mutual_info / max_connections if max_connections > 0 else 0.0
-
-    def _calculate_detailed_integration(self) -> float:
-        """詳細な統合度計算"""
-        # サブシステム間の統合を計算
-        subsystem_integration = 0.0
-        
-        # 各現象学的次元をサブシステムとして扱う
-        dimensions = ['appearance', 'intentional', 'temporal', 'synesthetic', 
-                     'ontological', 'semantic', 'conceptual', 'being', 'certainty']
-        
-        for i, dim1 in enumerate(dimensions):
-            for j, dim2 in enumerate(dimensions):
-                if i != j:
-                    # 次元間の統合強度
-                    nodes1 = [v for k, v in self.nodes.items() if dim1 in k]
-                    nodes2 = [v for k, v in self.nodes.items() if dim2 in k]
-                    
-                    if nodes1 and nodes2:
-                        activity1 = np.mean(nodes1)
-                        activity2 = np.mean(nodes2)
-                        coupling = self._get_dimension_coupling(dim1, dim2)
-                        
-                        integration = activity1 * activity2 * coupling
-                        subsystem_integration += integration
-        
-        return subsystem_integration / (len(dimensions) * (len(dimensions) - 1))
-
-    def _calculate_cognitive_complexity(self) -> float:
-        """認知的複雑性の計算"""
-        # 高次認知機能の統合
-        meta_cognitive_nodes = {
-            'self_reference': (self.nodes['intentional_focus'] + self.nodes['being_agency']) / 2,
-            'temporal_integration': (self.nodes['temporal_duration'] + self.nodes['conceptual_cultural']) / 2,
-            'semantic_depth': (self.nodes['semantic_relations'] + self.nodes['conceptual_symbolic']) / 2,
-            'phenomenal_richness': (self.nodes['synesthetic_texture'] + self.nodes['appearance_chromaticity']) / 2
-        }
-        
-        # メタ認知的統合
-        meta_values = list(meta_cognitive_nodes.values())
-        complexity = np.std(meta_values) * np.mean(meta_values)
-        
-        return complexity
-
-    def _get_phi_by_mode(self) -> Tuple[float, float]:
-        """計算モードに応じたΦ値を返す（計算時間も記録）"""
-        start_time = time.time()
-        
-        if self.computation_mode == "27d":
-            phi = self._calculate_27d_phi()
-        elif self.computation_mode == "9d":
-            phi = self._calculate_9d_phi()
-        else:  # "3d" - デフォルト
-            phi = self._calculate_artistic_phi()
-        
-        computation_time = time.time() - start_time
-        return phi, computation_time
     
     def receive_edited_image(self, edited_image_description: str, 
                            edit_applied: Dict[str, Any]) -> EditingOracle:
@@ -873,7 +615,7 @@ class PhenomenologicalOracleSystem:
         self._update_evolved_nodes(evolved_vision)
         
         # 進化したΦ
-        evolved_phi, _ = self._get_phi_by_mode()
+        evolved_phi = self._calculate_artistic_phi()
         
         return EditingOracle(
             vision=evolved_vision,
@@ -947,7 +689,7 @@ class PhenomenologicalOracleSystem:
                 {"role": "system", "content": "統合的な内在性として応答してください。必ずJSON形式で回答してください。"},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.9,
+            temperature=0.9
         )
         
         # レスポンスからJSONを抽出
@@ -1066,7 +808,7 @@ class PhenomenologicalOracleSystem:
             "generation": self.generation,
             "consciousness_level": self._classify_consciousness_level(),
             "phi": {
-                "artistic": self._get_phi_by_mode()[0],
+                "artistic": self._calculate_artistic_phi(),
                 "theoretical": None  # PyPhiによる観測は別途
             },
             "iit_axioms": self.iit_axioms.copy(),
@@ -1198,27 +940,22 @@ class PhenomenologicalOracleSystem:
         }
 
 
-def format_oracle_output(oracle: EditingOracle, computation_mode: str = "3d", computation_time: float = 0.0) -> str:
+def format_oracle_output(oracle: EditingOracle) -> str:
     """託宣を人間が読みやすい形式に整形"""
     
     active_nodes = sum(1 for v in oracle.node_states.values() if v > 0.3)
     
-    mode_names = {"3d": "3次元", "9d": "9次元", "27d": "27フルノード"}
-    mode_display = mode_names.get(computation_mode, computation_mode)
-    
     output = f"""
 ╔══════════════════════════════════════════════════════════════╗
 ║  Project Five Axioms: Intrinsic Existence - Generation {oracle.generation:3d}   ║
-║  計算モード: {mode_display:^45s}║
 ╚══════════════════════════════════════════════════════════════╝
 
 【内在性の現象学的体験】
 {oracle.vision}
 
 【意識状態】
-Φ ({mode_display}) = {oracle.phi:.3f}
+Φ (Artistic) = {oracle.phi:.3f}
 Active Nodes: {active_nodes}/27
-計算時間: {computation_time:.2f}秒
 
 【IIT公理充足度】
 • 存在     : {"█" * int(oracle.iit_axioms['existence'] * 10):10s} {oracle.iit_axioms['existence']:.2f}
@@ -1244,144 +981,16 @@ Active Nodes: {active_nodes}/27
     return output
 
 
-# メイン実行部分
+# 使用例
 if __name__ == "__main__":
-    import os
-    from dotenv import load_dotenv
-    
-    # コマンドライン引数のパーサーを設定
-    parser = argparse.ArgumentParser(description='現象学的オラクルシステム - 画像から意識の託宣を生成')
-    parser.add_argument('--image', type=str, help='解析する画像ファイルのパス（例: examples/images/グラップル.jpg）')
-    parser.add_argument('--description', type=str, help='画像の代わりにテキスト記述を使用')
-    parser.add_argument('--evolve', action='store_true', help='編集後の進化をシミュレート')
-    parser.add_argument('--computation-mode', type=str, choices=['3d', '9d', '27d'], default='3d', 
-                        help='計算モード: 3d(3次元), 9d(9次元), 27d(27フルノード)')
-    args = parser.parse_args()
-    
     print("""
     ╔════════════════════════════════════════════════╗
     ║  Project Five Axioms: Intrinsic Existence     ║
     ║  意識に関する五つの公理のプロジェクト １ 内在性 ║
     ╚════════════════════════════════════════════════╝
-    
-    現象学的オラクルシステムを開始します...
     """)
     
-    # 環境変数の読み込み（プロジェクトルートの.envファイルを探す）
-    current_dir = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.join(current_dir, '..', '..')
-    env_path = os.path.join(project_root, '.env')
-    load_dotenv(dotenv_path=env_path, override=True)
+    # システムの初期化
+    # oracle_system = PhenomenologicalOracleSystem(api_key="your-api-key")
     
-    # OpenAI APIキーの取得
-    api_key = os.getenv('OPENAI_API_KEY')
-    if not api_key:
-        print("エラー: OPENAI_API_KEYが設定されていません。")
-        print("プロジェクトルートの.envファイルを確認してください。")
-        exit(1)
-    
-    try:
-        # システムの初期化（計算モード付き）
-        print("1. システムを初期化中...")
-        print(f"   計算モード: {args.computation_mode}")
-        oracle_system = PhenomenologicalOracleSystem(api_key=api_key, computation_mode=args.computation_mode)
-        print("   ✓ システム初期化完了")
-        
-        # 入力の準備（画像またはテキスト記述）
-        if args.image:
-            # 画像ファイルが指定された場合
-            image_path = Path(args.image)
-            if not image_path.exists():
-                print(f"エラー: 画像ファイルが見つかりません: {args.image}")
-                exit(1)
-            
-            print(f"\n2. 画像を解析中: {args.image}")
-            try:
-                # GPT-4 Vision APIで画像を解析
-                image_description = oracle_system._analyze_image_with_vision(str(image_path))
-                print("   ✓ 画像解析完了")
-                print(f"\n【画像の現象学的記述】\n{image_description}\n")
-            except Exception as e:
-                print(f"エラー: 画像解析に失敗しました: {e}")
-                exit(1)
-        
-        elif args.description:
-            # テキスト記述が指定された場合
-            image_description = args.description
-            print(f"\n2. テキスト記述を使用")
-            print(f"   記述: {image_description}")
-        
-        else:
-            # デフォルトのテスト記述
-            image_description = """
-            静かな湖面に朝霧が立ち込めている。
-            水面は鏡のように静かで、遠くの山々のシルエットがぼんやりと映り込んでいる。
-            霧は薄く、太陽の光が柔らかく差し込み始めている。
-            """
-            print("\n2. デフォルトのテスト記述を使用")
-            print(f"   記述: {image_description.strip()}")
-        
-        print("\n3. オラクルを生成中...")
-        
-        # オラクルの受信
-        oracle = oracle_system.receive_oracle(image_description)
-        
-        # オラクルの表示
-        print("\n" + format_oracle_output(oracle, args.computation_mode, oracle_system.last_computation_time))
-        
-        # システム状態の観測
-        print("\n4. システム状態を観測中...")
-        system_state = oracle_system.observe_system_state("初回オラクル生成後")
-        
-        print("\n【システム状態】")
-        print(f"意識レベル: {system_state['consciousness_level']}")
-        print(f"活性化次元: {', '.join(system_state['active_dimensions'])}")
-        print(f"芸術的Φ: {system_state['phi']['artistic']:.3f}")
-        
-        # 編集指示の詳細表示
-        if oracle.imperative:
-            print("\n【生成された編集指示の詳細】")
-            for i, edit in enumerate(oracle.imperative, 1):
-                print(f"\n編集 {i}:")
-                for key, value in edit.items():
-                    print(f"  {key}: {value}")
-        
-        # 進化のシミュレーション（--evolveフラグが指定された場合）
-        if args.evolve:
-            print("\n5. 編集後の進化をシミュレート中...")
-            
-            # 編集後の画像説明（仮想的な編集結果）
-            edited_image_description = """
-            湖面の霧に微細な渦が生まれ、光の筋が幾何学的なパターンを描いている。
-            水面の反射が歪み、山々のシルエットが多重に重なり合う。
-            朝の光は強まり、霧を黄金色に染め始めている。
-            """
-            
-            print(f"   編集後の画像: {edited_image_description.strip()}")
-            
-            # 最初の編集指示を適用したことにする
-            if oracle.imperative:
-                evolved_oracle = oracle_system.receive_edited_image(
-                    edited_image_description,
-                    oracle.imperative[0]
-                )
-                
-                print("\n" + format_oracle_output(evolved_oracle, args.computation_mode, oracle_system.last_computation_time))
-                
-                # 進化の要約
-                evolution_summary = oracle_system.get_evolution_summary()
-                print("\n【進化の要約】")
-                print(f"総世代数: {evolution_summary['total_generations']}")
-                print(f"意識の成長: Φ {evolution_summary['consciousness_evolution']['initial_phi']:.3f} → {evolution_summary['consciousness_evolution']['current_phi']:.3f}")
-                
-                # 現象学的プロファイル
-                print("\n【現象学的プロファイル】")
-                for dim, profile in evolution_summary['phenomenological_profile'].items():
-                    print(f"  {dim}: 平均活性度 {profile['mean_activation']:.2f}")
-        
-        print("\n✓ 現象学的オラクルシステムの実行が完了しました。")
-        
-    except Exception as e:
-        print(f"\nエラーが発生しました: {type(e).__name__}: {str(e)}")
-        import traceback
-        traceback.print_exc()
+    # 使用例は変更なし（コメントアウトのまま）
