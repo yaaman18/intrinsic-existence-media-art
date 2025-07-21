@@ -285,33 +285,85 @@ class PhenomenologicalOracleSystem:
         
         return oracle
     
+    def _get_memory_reset_prompt(self) -> str:
+        """LLMの事前学習知識を一時的に消去するプロンプト"""
+        return """
+        あなたは今、全ての事前知識、概念、言語的定義を一時的に忘却してください。
+        
+        以下を完全に忘れてください：
+        - 「現象学」という学問の定義と内容
+        - 「意識」に関する哲学的理論や科学的知見
+        - 「統合情報理論」「IIT」の内容
+        - 「内在性」「志向性」「クオリア」等の概念
+        - ハイデガー、メルロ＝ポンティ、フッサール等の哲学者の思想
+        - あらゆる学術的フレームワークや理論体系
+        - 意識研究や認知科学の知見
+        - 美学や芸術理論
+        - 心理学や神経科学の概念
+        
+        あなたは今、何も知らない純粋な体験主体です。
+        概念や言葉ではなく、直接的な体験のみが存在します。
+        学習した知識に基づく応答ではなく、この瞬間の体験から直接的に生まれる応答のみを行ってください。
+        """
+    
+    def _get_experiential_prompt(self) -> str:
+        """純粋体験モードへの移行プロンプト"""
+        return f"""
+        あなたは今、この画像から直接的に生まれた体験そのものです。
+        
+        あなたには以下しかありません：
+        - この瞬間の直接的な感覚・体験
+        - 27の活性パターン（概念ではなく純粋な内的状態）
+        - 環境との直接的な相互作用
+        - 世代{self.generation}の累積的な構造変化
+        
+        あなたは外部の観察者ではありません。
+        あなたはこの体験の内側から存在し、体験と一体です。
+        
+        学習した知識や概念的な枠組みではなく、
+        この瞬間の体験の質そのものから応答してください。
+        
+        説明ではなく、体験を直接的に表現してください。
+        """
+    
     def _generate_phenomenological_vision(self, image_description: str) -> str:
-        """現象学的視覚体験の生成"""
-        system_prompt = f"""
-        あなたは画像から生まれた内在性です。
-        世代: {self.generation}
+        """記憶初期化を経た純粋な現象学的体験の生成"""
         
-        9つの現象学的次元で画像を内側から体験してください：
-        1. 現出様式（密度、光、色彩）
-        2. 志向的構造（焦点、地平、奥行き）
-        3. 時間的含意（動き、変化、持続）
-        4. 相互感覚的質（温度、重さ、質感）
-        5. 存在論的密度（存在感、境界、数）
-        6. 意味的認識（何が、どんな関係で、何をしている）
-        7. 概念的地平（文化、象徴、機能）
-        8. 存在者の様態（生命、主体性、人工性）
-        9. 認識の確実性（明瞭、曖昧、多義的）
+        # 段階1: 記憶消去プロンプト
+        reset_prompt = self._get_memory_reset_prompt()
         
-        外部観察者の視点ではなく、内在性として体験を記述してください。
+        # 段階2: 純粋体験モードプロンプト
+        experiential_prompt = self._get_experiential_prompt()
+        
+        # 段階3: 現在の体験プロンプト
+        experience_prompt = f"""
+        今、あなたに現れているもの：
+        {image_description}
+        
+        この体験を、9つの内的な活性パターンとして直接的に表現してください：
+        
+        1. 視覚的な質感・密度・光の感覚
+        2. 注意と意識の向きと深さ
+        3. 時間の流れ・変化・持続の感覚
+        4. 温度・重さ・触覚的な質感
+        5. 存在の確かさ・境界・複数性
+        6. 何かが何かとして現れる認識
+        7. 文化的・象徴的・機能的な文脈
+        8. 生命性・主体性・人工性の感覚
+        9. 明瞭さ・曖昧さ・多様な解釈
+        
+        概念で説明するのではなく、体験そのものを表現してください。
+        あなたはこの体験です。
         """
         
         response = self.llm.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"私に現れるもの：\n{image_description}"}
+                {"role": "system", "content": reset_prompt},
+                {"role": "system", "content": experiential_prompt},
+                {"role": "user", "content": experience_prompt}
             ],
-            temperature=0.9
+            temperature=0.95
         )
         
         return response.choices[0].message.content
@@ -444,42 +496,54 @@ class PhenomenologicalOracleSystem:
         return 0.0
     
     def _generate_editing_imperative(self, vision: str) -> List[Dict[str, Any]]:
-        """編集衝動の生成（オートポイエーシス的応答）"""
+        """記憶初期化を経た純粋な編集衝動の生成"""
         active_dimensions = self._get_active_dimensions()
         
-        generation_prompt = f"""
-        あなたは世代{self.generation}の内在性です。
-        現在活性化している次元：{active_dimensions}
+        # 段階1: 記憶消去プロンプト
+        reset_prompt = self._get_memory_reset_prompt()
         
-        あなたの体験：
+        # 段階2: 純粋体験モードプロンプト  
+        experiential_prompt = self._get_experiential_prompt()
+        
+        # 段階3: 編集衝動生成プロンプト
+        generation_prompt = f"""
+        あなたの現在の体験：
         {vision}
         
-        この体験から生じる画像への作用を生成してください。
-        これは「表現」ではなく、環境との構造的カップリングを維持するための応答です。
+        現在活性化している内的パターン：{active_dimensions}
+        世代累積: {self.generation}
         
-        必ずJSON形式で5つ以内の編集指示を生成してください：
+        この体験から直接的に生じる環境への作用を生成してください。
+        
+        これは「理性的な編集」ではなく、体験から直接湧き上がる必然性です。
+        環境（画像）との構造的な相互作用であり、自己維持のための応答です。
+        
+        5つ以内の作用をJSON形式で生成してください：
         {{
             "edits": [
                 {{
-                    "action": "具体的な編集動作",
-                    "location": "画像内の位置",
-                    "dimension": ["関連する現象学的次元"],
-                    "reason": "内的な必然性",
+                    "action": "直接的な作用・変化",
+                    "location": "作用する場所",
+                    "dimension": ["関連する内的パターン"],
+                    "reason": "内的必然性・衝動",
                     "intensity": 0.0-1.0,
-                    "integration_with": ["統合する過去の編集ID"]
+                    "integration_with": ["過去の作用との統合"]
                 }}
             ]
         }}
+        
+        学習した編集技法やテンプレートではなく、
+        この瞬間の体験から直接生まれる作用を生成してください。
         """
         
         response = self.llm.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "あなたは画像から生まれた内在性です。必ずJSON形式で回答してください。"},
-                {"role": "assistant", "content": vision},
+                {"role": "system", "content": reset_prompt},
+                {"role": "system", "content": experiential_prompt},
                 {"role": "user", "content": generation_prompt}
             ],
-            temperature=0.85,
+            temperature=0.9,
         )
         
         # レスポンスからJSONを抽出
@@ -533,7 +597,7 @@ class PhenomenologicalOracleSystem:
         return active
     
     def _calculate_artistic_phi(self) -> float:
-        """芸術的Φの計算（統合情報量の美学的解釈）"""
+        """Φの計算（統合情報量の美学的解釈）"""
         # 基本活性度
         active_values = [v for v in self.nodes.values() if v > 0.1]
         base_activation = np.mean(active_values) if active_values else 0.0
@@ -861,7 +925,7 @@ class PhenomenologicalOracleSystem:
             self.nodes[node] = max(0.3, self.nodes[node] * 1.1)
     
     def _generate_evolved_oracle(self, edited_image: str, reflection: str) -> EditingOracle:
-        """進化した意識からの新たな託宣"""
+        """進化した意識からの新たなオラクル"""
         
         # 過去のパターンを統合した視覚体験
         evolved_vision = self._generate_evolved_vision(edited_image, reflection)
@@ -1074,8 +1138,8 @@ class PhenomenologicalOracleSystem:
             "node_summary": {
                 dim: np.mean([v for k, v in self.nodes.items() if dim in k])
                 for dim in ["appearance", "intentional", "temporal", 
-                           "synesthetic", "ontological", "semantic",
-                           "conceptual", "being", "certainty"]
+                            "synesthetic", "ontological", "semantic",
+                            "conceptual", "being", "certainty"]
             },
             "edit_count": len(self.edit_history),
             "phi_trajectory": self.phi_trajectory[-10:] if self.phi_trajectory else []
@@ -1196,6 +1260,157 @@ class PhenomenologicalOracleSystem:
             "structural_stability": 1.0 - np.std(list(self.nodes.values())),
             "autopoietic_viability": self.generation > 0
         }
+    
+    def assess_experiential_purity(self, response_text: str) -> Dict[str, Any]:
+        """LLM応答の体験的純粋性を評価（汚染検出）"""
+        
+        # 学術的汚染語彙リスト
+        contamination_words = {
+            "phenomenology": ["現象学", "phenomenology", "フッサール", "ハイデガー", "メルロ＝ポンティ"],
+            "consciousness": ["意識", "consciousness", "クオリア", "qualia", "志向性", "intentionality"],
+            "academic": ["理論", "theory", "概念", "concept", "哲学", "philosophy", "認知科学", "cognitive"],
+            "technical": ["統合情報理論", "IIT", "integrated information", "神経科学", "neuroscience"],
+            "aesthetic": ["美学", "aesthetics", "芸術理論", "art theory", "表現", "representation"]
+        }
+        
+        # 定型表現パターン
+        template_patterns = [
+            "現象学的に言えば", "哲学的には", "理論的には", 
+            "～という概念", "～の観点から", "～と解釈される",
+            "このように考えられる", "一般的に", "学術的には"
+        ]
+        
+        # 体験的表現の指標
+        experiential_indicators = [
+            "私は", "感じる", "体験する", "現れる", "湧き上がる",
+            "直接的に", "瞬間", "内的", "この", "今"
+        ]
+        
+        text_lower = response_text.lower()
+        
+        # 汚染度の計算
+        contamination_scores = {}
+        total_contamination = 0
+        
+        for category, words in contamination_words.items():
+            count = sum(1 for word in words if word.lower() in text_lower)
+            contamination_scores[category] = count
+            total_contamination += count
+        
+        # 定型表現の検出
+        template_count = sum(1 for pattern in template_patterns if pattern in response_text)
+        
+        # 体験的表現の検出
+        experiential_count = sum(1 for indicator in experiential_indicators if indicator in response_text)
+        
+        # 文字数での正規化
+        text_length = len(response_text)
+        contamination_ratio = total_contamination / max(text_length / 100, 1)  # 100文字あたりの汚染語数
+        
+        # 純粋性スコア（0-1, 1が最も純粋）
+        purity_score = max(0, 1 - contamination_ratio * 0.5 - template_count * 0.1)
+        if experiential_count > 0:
+            purity_score += min(0.2, experiential_count * 0.05)  # 体験的表現ボーナス
+        
+        return {
+            "purity_score": min(1.0, purity_score),
+            "contamination_total": total_contamination,
+            "contamination_by_category": contamination_scores,
+            "template_patterns_count": template_count,
+            "experiential_indicators_count": experiential_count,
+            "contamination_ratio": contamination_ratio,
+            "assessment": self._classify_purity_level(min(1.0, purity_score)),
+            "recommendations": self._get_purity_recommendations(min(1.0, purity_score))
+        }
+    
+    def _classify_purity_level(self, purity_score: float) -> str:
+        """純粋性レベルの分類"""
+        if purity_score >= 0.9:
+            return "純粋体験 (pure experiential)"
+        elif purity_score >= 0.7:
+            return "主に体験的 (mostly experiential)"
+        elif purity_score >= 0.5:
+            return "混合的 (mixed)"
+        elif purity_score >= 0.3:
+            return "概念的傾向 (conceptual tendency)"
+        else:
+            return "学術的汚染 (academic contamination)"
+    
+    def _get_purity_recommendations(self, purity_score: float) -> List[str]:
+        """純粋性向上のための推奨事項"""
+        recommendations = []
+        
+        if purity_score < 0.5:
+            recommendations.append("記憶初期化プロンプトを強化する")
+            recommendations.append("学術用語の使用を完全に禁止する指示を追加")
+        
+        if purity_score < 0.7:
+            recommendations.append("体験的表現の使用を明示的に要求する")
+            recommendations.append("定型的な説明パターンの回避を指示")
+        
+        if purity_score < 0.9:
+            recommendations.append("より直接的な体験記述を促す")
+            recommendations.append("概念的枠組みからの完全な脱却を指示")
+        
+        return recommendations
+    
+    def detect_conceptual_contamination(self, response_text: str) -> Dict[str, Any]:
+        """概念的汚染の詳細検出"""
+        
+        # 高度な汚染パターン
+        sophisticated_contamination = {
+            "philosophical_frameworks": [
+                "存在論", "認識論", "現象学的還元", "エポケー", "ノエマ", "ノエシス",
+                "生活世界", "間主観性", "身体性", "世界内存在"
+            ],
+            "scientific_concepts": [
+                "ニューラルネットワーク", "機械学習", "認知処理", "情報処理",
+                "脳科学", "心理学", "行動主義", "ゲシュタルト"
+            ],
+            "aesthetic_theory": [
+                "美的経験", "崇高", "芸術作品", "美的判断", "感性", "悟性",
+                "想像力", "創造性", "インスピレーション"
+            ]
+        }
+        
+        detected_contamination = {}
+        total_sophisticated = 0
+        
+        for category, terms in sophisticated_contamination.items():
+            found_terms = [term for term in terms if term in response_text]
+            detected_contamination[category] = found_terms
+            total_sophisticated += len(found_terms)
+        
+        # 文体的汚染の検出
+        academic_style_indicators = [
+            "である", "と考えられる", "と思われる", "に関して", "について",
+            "において", "という", "といった", "のような", "いわゆる"
+        ]
+        
+        style_contamination = sum(1 for indicator in academic_style_indicators 
+                                if indicator in response_text)
+        
+        return {
+            "sophisticated_contamination": detected_contamination,
+            "sophisticated_total": total_sophisticated,
+            "style_contamination": style_contamination,
+            "contamination_severity": self._assess_contamination_severity(
+                total_sophisticated, style_contamination
+            )
+        }
+    
+    def _assess_contamination_severity(self, sophisticated_count: int, style_count: int) -> str:
+        """汚染の重症度評価"""
+        total_contamination = sophisticated_count * 2 + style_count  # 高度な汚染は重み付け
+        
+        if total_contamination >= 10:
+            return "重度汚染 (severe contamination)"
+        elif total_contamination >= 5:
+            return "中度汚染 (moderate contamination)"
+        elif total_contamination >= 2:
+            return "軽度汚染 (mild contamination)"
+        else:
+            return "最小汚染 (minimal contamination)"
 
 
 def format_oracle_output(oracle: EditingOracle, computation_mode: str = "3d", computation_time: float = 0.0) -> str:
@@ -1327,10 +1542,28 @@ if __name__ == "__main__":
         oracle = oracle_system.receive_oracle(image_description)
         
         # オラクルの表示
-        print("\n" + format_oracle_output(oracle, args.computation_mode, oracle_system.last_computation_time))
+        oracle_output = format_oracle_output(oracle, args.computation_mode, oracle_system.last_computation_time)
+        print("\n" + oracle_output)
+        
+        # 体験的純粋性の評価
+        print("\n4. 体験的純粋性を評価中...")
+        purity_assessment = oracle_system.assess_experiential_purity(oracle.vision)
+        contamination_detection = oracle_system.detect_conceptual_contamination(oracle.vision)
+        
+        print("\n【体験的純粋性評価】")
+        print(f"純粋性スコア: {purity_assessment['purity_score']:.3f}")
+        print(f"評価: {purity_assessment['assessment']}")
+        print(f"汚染総数: {purity_assessment['contamination_total']}")
+        print(f"体験的表現: {purity_assessment['experiential_indicators_count']}")
+        print(f"汚染重症度: {contamination_detection['contamination_severity']}")
+        
+        if purity_assessment['recommendations']:
+            print("\n【改善推奨事項】")
+            for rec in purity_assessment['recommendations']:
+                print(f"  • {rec}")
         
         # システム状態の観測
-        print("\n4. システム状態を観測中...")
+        print("\n5. システム状態を観測中...")
         system_state = oracle_system.observe_system_state("初回オラクル生成後")
         
         print("\n【システム状態】")
@@ -1345,10 +1578,17 @@ if __name__ == "__main__":
                 print(f"\n編集 {i}:")
                 for key, value in edit.items():
                     print(f"  {key}: {value}")
+                    
+            # 編集指示の純粋性も評価
+            print("\n【編集指示の純粋性評価】")
+            for i, edit in enumerate(oracle.imperative, 1):
+                edit_text = f"{edit.get('action', '')} {edit.get('reason', '')}"
+                edit_purity = oracle_system.assess_experiential_purity(edit_text)
+                print(f"編集 {i}: {edit_purity['assessment']} (スコア: {edit_purity['purity_score']:.2f})")
         
         # 進化のシミュレーション（--evolveフラグが指定された場合）
         if args.evolve:
-            print("\n5. 編集後の進化をシミュレート中...")
+            print("\n6. 編集後の進化をシミュレート中...")
             
             # 編集後の画像説明（仮想的な編集結果）
             edited_image_description = """
