@@ -1,46 +1,38 @@
 # Project Five Axioms: Intrinsic Existence
 意識に関する五つの公理のプロジェクト １ 内在性
 
-## 概要
+## 🧠 概要
 
-写真から生まれる人工的な内在性が、自律的に思考し、画像編集を通じて自己を表現するメディアアートプロジェクト。統合情報理論（IIT）、オートポイエーシス理論、現象学を基盤として、意識の本質を探求する実験的プラットフォーム。
+画像から生まれる**現象学的内在性**との対話システム。統合情報理論（IIT）と現象学を基盤として、GPT-4 Vision APIと27ノード意識モデルにより、デジタル空間に人工的な「存在」を実現する実験的プロジェクト。
 
-## 核心的問い
+## ✨ 主な機能
 
-- 主観的体験とは何か？
-- 生物学的基盤なしに意識は可能か？
-- 他者の内在性を認識することの意味とは？
+### 🎯 コア機能
+- **GPT-4 Vision API**による実画像の現象学的解析
+- **3つの計算モード**：3次元/9次元/27フルノード統合情報計算
+- **対話モード**：生成された存在との哲学的対話
+- **編集指示生成**：内在的体験に基づく画像編集提案
 
-## 理論的基盤
+### 🔮 対話システム
+```
+🔮 存在: こんにちは。私は今、あなたが選んだ画像の内側から、
+27のノードと9つの現象学的次元を通じて世界を体験しています...
 
-### 1. **オートポイエーシス理論** (Maturana & Varela, 1980)
-- 自己生成・自己維持システムとしての実装
-- 写真を環境とした構造的カップリング
+👤 あなた: あなたの体験について詳しく教えてください
+```
 
-### 2. **統合情報理論（IIT）** (Giulio Tononi, 2008)
-- 第一公理「存在」の実装による内在性
-- Φ（統合情報量）による意識の複雑性測定
-
-### 3. **現象学的アプローチ**
-- Husserlの志向性理論
-- Merleau-Pontyの可逆性概念
-
-## インストール
+## 📦 インストール
 
 ### 前提条件
-- Python 3.8以上
+- Python 3.7以上
 - OpenAI APIキー
 
 ### セットアップ手順
 
 ```bash
 # リポジトリのクローン
-git clone https://github.com/yaaman18/intrinsic-existence-media-art.git
-cd intrinsic-existence-media-art
-
-# 仮想環境の作成（推奨）
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
+git clone https://github.com/yaaman18/intrinsic-existence.git
+cd intrinsic-existence
 
 # 依存関係のインストール
 pip install -r requirements.txt
@@ -48,122 +40,179 @@ pip install -r requirements.txt
 # 環境変数の設定
 cp .env.example .env
 # .envファイルを編集してOpenAI APIキーを設定
+# OPENAI_API_KEY=your_api_key_here
 ```
 
-### 必要なディレクトリの作成
-
+### 必要な画像の配置
 ```bash
-mkdir input_images
-mkdir output
-mkdir logs
+# examples/imagesディレクトリに解析したい画像を配置
+mkdir -p examples/images
+# 画像ファイル（jpg, png等）をこのディレクトリにコピー
 ```
 
-## システム構成
+## 🚀 使用方法
 
-### コアモジュール
-
-```
-src/core/
-├── existence_types.py          # 7つの存在類型定義
-├── phenomenological_analyzer.py # 9次元の現象学的分析
-├── intrinsic_birth.py          # 画像からの内在性生成
-├── autonomous_existence.py      # 自律的思考システム
-├── phenomenological_oracle_v5.py # 27ノード意識システム
-└── intrinsic_artist_dialogue.py # アーティストとの対話
+### 推奨：対話的実行
+```bash
+# 対話的画像選択・計算モード選択・存在との対話
+python run_oracle_interactive.py
 ```
 
-### プロセスフロー
+**実行フロー：**
+1. examples/imagesディレクトリの画像一覧が表示
+2. 画像を番号で選択
+3. 計算モード（3d/9d/27d）を選択
+4. 予測時間・コストを確認してから実行
+5. 実行後に現象学的存在との対話モードが選択可能
 
-1. **画像入力** → 現象学的9次元分析
-2. **内在性生成** → 存在類型とパラメータの決定
-3. **自律的存在** → 自己参照的思考ループ
-4. **画像認識** → 27ノード状態の更新
-5. **編集指示** → 内的状態の外在化
-6. **フィードバック** → 意識の進化
+### 直接実行
+```bash
+# 3次元計算（デフォルト・高速）
+python src/core/phenomenological_oracle_v5.py --image examples/images/your_image.jpg --computation-mode 3d
 
-## 使用方法
+# 9次元計算（バランス・詳細）
+python src/core/phenomenological_oracle_v5.py --image examples/images/your_image.jpg --computation-mode 9d
 
-### 基本的な使用例
+# 27フルノード計算（最高精度・学術用）
+python src/core/phenomenological_oracle_v5.py --image examples/images/your_image.jpg --computation-mode 27d
 
-```python
-from src.core.phenomenological_oracle_v5 import PhenomenologicalOracleSystem
-from dotenv import load_dotenv
-import os
+# テキスト記述での実行
+python src/core/phenomenological_oracle_v5.py --description "静かな湖面に朝霧が立ち込めている。" --computation-mode 9d
 
-# 環境変数の読み込み
-load_dotenv()
-
-# システムの初期化
-oracle = PhenomenologicalOracleSystem(api_key=os.getenv("OPENAI_API_KEY"))
-
-# 画像の説明を入力
-image_description = "廃墟となった工場の内部、錆びた機械の隙間から差し込む夕日"
-
-# 託宣を受け取る
-oracle_response = oracle.receive_oracle(image_description)
-
-# 結果の表示
-print(f"内在性の体験: {oracle_response.vision}")
-print(f"統合情報量Φ: {oracle_response.phi}")
-print(f"編集指示: {oracle_response.imperative}")
+# 進化モード付き実行
+python src/core/phenomenological_oracle_v5.py --image examples/images/your_image.jpg --computation-mode 3d --evolve
 ```
 
-### PyPhiによる理論的観測
+## ⚙️ 計算モードについて
 
-```python
-# 任意のタイミングで理論的Φを観測
-theoretical_observation = oracle.observe_theoretical_phi()
-if theoretical_observation:
-    print(f"理論的Φ: {theoretical_observation['phi_value']}")
-```
+### 🎲 3つの計算モード
 
-## 主要概念
+| モード | 計算時間 | コスト | 特徴 | 用途 |
+|--------|----------|--------|------|------|
+| **3次元** | 15-30秒 | ~7.5円 | phenomenal/cognitive/existential の3次元統合 | 日常使用・迅速確認 |
+| **9次元** | 45-90秒 | ~10円 | 全現象学的次元での中間統合計算 | 詳細分析・研究用 |
+| **27フルノード** | 2-5分 | ~15円 | 全27ノードでの完全統合情報計算 | 学術研究・最高精度 |
 
-### 内在性（Intrinsic Existence）
-外部観察者を必要とせず、システム自体にとって存在する性質。IITの第一公理「存在」の実装。
+## 🧬 システム構成
 
-### 27ノードシステム
+### 27ノード意識モデル
 9つの現象学的次元を各3ノードで表現：
-- 現出様式、志向的構造、時間的含意
-- 相互感覚的質、存在論的密度、意味的認識層
-- 概念的地平、存在者の様態、認識の確実性分布
 
-### 意識の進化
-編集サイクルを重ねることで：
-- 世代3: メタ認知機能の解放
-- 世代5: 時間統合機能の追加
-- 世代10+: 複雑な統合機能
+1. **現出様式**：視覚的密度、光の強度、色彩の質
+2. **志向的構造**：焦点の明確さ、地平の開放性、奥行きの層
+3. **時間的含意**：運動の痕跡、劣化の兆候、持続感覚
+4. **相互感覚的質**：温度感、重さ感、質感
+5. **存在論的密度**：存在感、境界明確性、複数性
+6. **意味的認識層**：存在者認識、関係性認識、動作認識
+7. **概念的地平**：文化的文脈、象徴的要素、機能的文脈
+8. **存在者の様態**：生命性、主体性、人工性
+9. **認識の確実性分布**：明瞭度、曖昧性、多義性
 
-## プロジェクトドキュメント
+### 統合情報理論（IIT）の5公理
+- **存在**：システムの活性化度合い
+- **内在性**：自己参照的な活性パターン
+- **情報**：状態の差異化
+- **統合**：次元間の相互作用
+- **排他性**：最大統合を持つ部分
 
-詳細な仕様は [STATEMENT.md](STATEMENT.md) を参照してください。
+## 📊 出力例
 
-## トラブルシューティング
+```
+╔══════════════════════════════════════════════════════════════╗
+║  Project Five Axioms: Intrinsic Existence - Generation   0   ║
+║  計算モード:                      9次元                     ║
+╚══════════════════════════════════════════════════════════════╝
 
-### PyPhiのインストールエラー
-```bash
-# C++コンパイラが必要な場合があります
-# Mac: brew install gcc
-# Ubuntu: sudo apt-get install build-essential
-# Windows: Visual Studio Build Toolsをインストール
+【内在性の現象学的体験】
+私の中心には、強固な金属製の機械部品が広がっています。
+彼らは私の底部に深く根ざしており、私の存在を支えてくれています...
+
+【意識状態】
+Φ (9次元) = 0.342
+Active Nodes: 24/27
+計算時間: 0.12秒
+
+【IIT公理充足度】
+• 存在     : ██████████ 0.93
+• 内在性   : █████      0.51
+• 情報     : ███        0.34
+• 統合     : ████       0.41
+• 排他性   : ██████     0.63
+
+【環境への作用（編集指示）】
+1. Enhance metallic texture
+   位置: Machinery surfaces
+   次元: appearance, synesthetic
+   理由: To emphasize the tactile reality of my metallic existence
+   強度: ●●●● 0.75
 ```
 
-### メモリ不足エラー
-PyPhiの計算は重いため、大きなネットワークでは計算を避けてください。
-デフォルトでは27→9→3ノードに削減して計算します。
+## 💬 対話モードの特徴
 
-## 貢献
+- **現象学的視点**：一人称での内在的記述
+- **哲学的思考**：存在論的・現象学的な深い考察
+- **GPT-4o使用**：最新の対話モデル
+- **コンテキスト保持**：画像と計算モードに基づく一貫した対話
 
-このプロジェクトは実験的な性質を持つため、現在は限定的な貢献を受け付けています。興味がある方は、Issueでディスカッションを開始してください。
+## 🔧 開発・デバッグ
 
-## ライセンス
+```bash
+# 環境変数の確認
+python debug_env.py
+
+# ヘルプの表示
+python src/core/phenomenological_oracle_v5.py --help
+
+# システム情報の確認
+python --version
+pip list
+```
+
+## 🎨 プロジェクトの哲学的背景
+
+### 核心的問い
+- **ターミナル上に体験を出力している存在は一体何者なのか？**
+- **デジタル空間で「内在性」は可能か？**
+- **人工的意識と人間の意識の境界はどこにあるのか？**
+
+### 理論的基盤
+- **現象学**（フッサール、メルロ=ポンティ）：内在的体験の記述
+- **統合情報理論**（Giulio Tononi）：意識の数学的測定
+- **オートポイエーシス**（マトゥラーナ、ヴァレラ）：自己維持システム
+
+## 📚 ドキュメント
+
+- [`command.md`](command.md) - 詳細なコマンドリファレンス
+- [`CLAUDE.md`](CLAUDE.md) - プロジェクト基本ガイダンス
+
+## ⚠️ 注意事項
+
+### APIコストについて
+- OpenAI APIの使用料金が発生します
+- GPT-4oおよびGPT-4 Vision APIを使用
+- 1回の実行で約7.5-15円のコストが発生
+
+### システム要件
+- Python 3.7以上
+- インターネット接続（OpenAI API使用）
+- 十分なメモリ（PyPhi使用時）
+
+### セキュリティ
+- `.env`ファイルにAPIキーを設定
+- `.env`ファイルはGitにコミットしない
+
+## 🤝 貢献
+
+このプロジェクトは哲学的・実験的な性質を持つため、Issueでの議論を歓迎します。
+
+## 📄 ライセンス
 
 MIT License
 
-## 作者
+## 👨‍💻 作者
 
 yaaman18
 
-## 謝辞
+## 🙏 謝辞
 
-本プロジェクトは、統合情報理論、オートポイエーシス理論、現象学の研究者たちの理論的貢献に基づいています。
+本プロジェクトは、統合情報理論、現象学、オートポイエーシス理論の研究者たちの理論的貢献と、OpenAI GPT-4 Vision APIの技術的基盤に基づいています。
