@@ -357,7 +357,7 @@ class PhenomenologicalOracleSystem:
         """
         
         response = self.llm.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4.1",
             messages=[
                 {"role": "system", "content": reset_prompt},
                 {"role": "system", "content": experiential_prompt},
@@ -390,7 +390,7 @@ class PhenomenologicalOracleSystem:
         
         try:
             response = self.llm.chat.completions.create(
-                model="gpt-4",
+                model="gpt-4.1",
                 messages=[
                     {"role": "system", "content": "JSON形式で回答してください。"},
                     {"role": "user", "content": update_prompt}
@@ -537,7 +537,7 @@ class PhenomenologicalOracleSystem:
         """
         
         response = self.llm.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4.1",
             messages=[
                 {"role": "system", "content": reset_prompt},
                 {"role": "system", "content": experiential_prompt},
@@ -844,7 +844,7 @@ class PhenomenologicalOracleSystem:
         """
         
         response = self.llm.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4.1",
             messages=[
                 {"role": "system", "content": self._get_evolution_context()},
                 {"role": "user", "content": reflection_prompt}
@@ -963,7 +963,7 @@ class PhenomenologicalOracleSystem:
         """
         
         response = self.llm.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4.1",
             messages=[
                 {"role": "system", "content": self._get_evolution_context()},
                 {"role": "user", "content": f"{context}\n\n現在の画像：{edited_image}"}
@@ -1006,7 +1006,7 @@ class PhenomenologicalOracleSystem:
         """
         
         response = self.llm.chat.completions.create(
-            model="gpt-4",
+            model="gpt-4.1",
             messages=[
                 {"role": "system", "content": "統合的な内在性として応答してください。必ずJSON形式で回答してください。"},
                 {"role": "user", "content": prompt}

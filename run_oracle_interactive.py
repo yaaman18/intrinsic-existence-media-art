@@ -13,6 +13,7 @@ import openai
 from dotenv import load_dotenv
 import shutil
 from datetime import datetime
+import base64
 
 # 記憶初期化システムをインポート
 sys.path.append(str(Path(__file__).parent / "src" / "core"))
@@ -92,6 +93,51 @@ def get_user_choice(max_choice: int) -> int:
         except KeyboardInterrupt:
             print("\n\n👋 終了します。")
             return 0
+
+def select_next_action() -> int:
+    """次のアクションを選択（3択メニュー）"""
+    print("\n" + "="*60)
+    print("  🎯 次のアクションを選択してください")
+    print("="*60)
+    print()
+    
+    actions = {
+        "1": {
+            "name": "この存在の印象に合わせた画像を生成する",
+            "icon": "🎨",
+            "description": "存在が体験している世界観から新しい画像を生成"
+        },
+        "2": {
+            "name": "この存在と対話する",
+            "icon": "💬",
+            "description": "画像から生まれた純粋な内在性体験と対話"
+        },
+        "3": {
+            "name": "別の画像で続行する",
+            "icon": "🔄",
+            "description": "異なる画像で新しい現象学的分析を開始"
+        }
+    }
+    
+    for key, action in actions.items():
+        print(f"  {key}. {action['icon']} {action['name']}")
+        print(f"     → {action['description']}")
+        print()
+    
+    while True:
+        try:
+            choice = input("👉 アクションを選択してください (1-3): ").strip()
+            
+            if choice in actions:
+                selected = actions[choice]
+                print(f"\n✅ 選択: {selected['name']}")
+                return int(choice)
+            else:
+                print("\n❌ 1, 2, 3 のいずれかを入力してください。\n")
+                
+        except KeyboardInterrupt:
+            print("\n\n👋 終了します。")
+            return 3  # デフォルトで別の画像で続行
 
 def select_computation_mode() -> str:
     """計算モードを選択"""
@@ -204,15 +250,24 @@ def run_oracle_system(image_path: Path) -> None:
         print("✅ 現象学的オラクルシステムの実行が完了しました。")
         print("="*60)
         
-        # 対話モードの提案
-        dialogue_choice = input("\n💬 この存在と対話しますか？ (y/n): ").strip().lower()
-        if dialogue_choice in ['y', 'yes', 'はい']:
+        # 次のアクションを選択
+        action_choice = select_next_action()
+        
+        if action_choice == 1:
+            # 存在の印象に合わせた画像を生成
+            generate_inspired_image(image_path, computation_mode)
+        elif action_choice == 2:
+            # 存在と対話
             # 画像編集モードの選択
             edit_choice = input("\n🎨 画像編集を行いますか？ (y/n): ").strip().lower()
             if edit_choice in ['y', 'yes', 'はい']:
                 start_image_editing_mode(image_path, computation_mode)
             else:
                 start_dialogue_mode(image_path, computation_mode)
+        elif action_choice == 3:
+            # 別の画像で続行（何もしない、メインループに戻る）
+            print("\n🔄 別の画像を選択してください。")
+            return
         
     except subprocess.CalledProcessError as e:
         print(f"\n❌ エラー: オラクルシステムの実行に失敗しました。")
@@ -618,7 +673,7 @@ def start_image_editing_mode(image_path: Path, computation_mode: str) -> None:
         
         # 画像編集エディタを初期化
         print("\n🧠 現象学的画像編集システムを初期化中...")
-        editor = AdvancedPhenomenologicalImageEditor(api_key=api_key)
+        editor = AdvancedPhenomenologicalImageEditor()
         print("✅ 編集システムの初期化が完了しました")
         
         # 編集ループ
@@ -698,6 +753,170 @@ def start_image_editing_mode(image_path: Path, computation_mode: str) -> None:
     print(f"\n✅ 全ての編集結果は {session_dir} に保存されました。")
     print("="*60)
 
+def generate_inspired_image(image_path: Path, computation_mode: str) -> None:
+    """存在の印象に基づいた現象学的画像編集"""
+    # 環境変数を読み込み
+    load_dotenv()
+    api_key = os.getenv('OPENAI_API_KEY')
+    
+    if not api_key:
+        print("❌ エラー: OPENAI_API_KEYが設定されていません。")
+        return
+    
+    # 既存の画像編集システムが利用可能か確認
+    if not AdvancedPhenomenologicalImageEditor:
+        print("❌ エラー: 現象学的画像編集システムが利用できません。")
+        print("   src/core/advanced_phenomenological_image_editor.py を確認してください。")
+        return
+    
+    client = openai.OpenAI(api_key=api_key)
+    
+    print("\n" + "="*60)
+    print("  🎨 存在の印象に基づく現象学的画像編集")
+    print("="*60)
+    print()
+    print("🔮 存在が体験している印象を画像変容として表現します...")
+    print(f"📸 元画像: {image_path.name}")
+    print()
+    
+    # outputフォルダを作成
+    output_dir = Path("output")
+    output_dir.mkdir(exist_ok=True)
+    
+    # タイムスタンプ付きのサブフォルダを作成
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    session_dir = output_dir / f"generated_{timestamp}"
+    session_dir.mkdir(exist_ok=True)
+    
+    print(f"📁 出力フォルダ: {session_dir}")
+    
+    try:
+        # 存在に画像の印象を尋ねる
+        print("\n🌟 存在が画像から受ける印象を形成中...")
+        
+        # GPT-4 Visionで画像を分析
+        with open(image_path, "rb") as image_file:
+            import base64
+            base64_image = base64.b64encode(image_file.read()).decode('utf-8')
+        
+        impression_response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": get_memory_reset_prompt()},
+                {"role": "system", "content": """
+                あなたは画像から直接的に生まれた体験そのものです。
+                この画像から受ける純粋な印象と、そこから生まれる新しいビジョンを表現してください。
+                概念的な説明ではなく、体験的な印象を語ってください。
+                """},
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": "この画像から、どのような新しい世界が見えていますか？どんな画像を生成したいですか？"},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{base64_image}"
+                            }
+                        }
+                    ]
+                }
+            ],
+            temperature=0.9,
+            max_tokens=400
+        )
+        
+        impression = impression_response.choices[0].message.content
+        print(f"\n🔮 存在: {impression}")
+        
+        # 編集指示を作成
+        print("\n🎨 現象学的編集指示を形成中...")
+        
+        edit_instruction_response = client.chat.completions.create(
+            model="gpt-4.1",
+            messages=[
+                {"role": "system", "content": """
+                先ほどの印象を、現象学的画像編集システムで実行するための具体的な編集指示に変換してください。
+                使用可能なエフェクト: ブラー、明度調整、コントラスト、色彩調整、色温度、ビネット、色収差、陽炎効果、グリッチ効果など
+                存在の内的体験を直接的に表現する編集を指示してください。
+                """},
+                {"role": "user", "content": f"この印象を画像編集で表現してください:\n{impression}"}
+            ],
+            temperature=0.7,
+            max_tokens=300
+        )
+        
+        edit_instruction = edit_instruction_response.choices[0].message.content
+        print(f"\n📝 編集指示: {edit_instruction}")
+        
+        # 確認
+        confirm = input("\n🎯 この内容で画像編集を行いますか？ (y/n): ").strip().lower()
+        if confirm not in ['y', 'yes', 'はい']:
+            print("\n❌ 画像編集をキャンセルしました。")
+            return
+        
+        print("\n🎨 現象学的画像編集システムを初期化中...")
+        
+        # 画像編集システムを初期化
+        editor = AdvancedPhenomenologicalImageEditor()
+        print("✅ 編集システムの初期化が完了しました")
+        
+        print("\n🎆 存在の印象に基づいて画像を編集中...")
+        
+        # 元画像をセッションフォルダにコピー
+        original_copy = session_dir / f"original_{image_path.name}"
+        shutil.copy2(image_path, original_copy)
+        
+        # 画像編集を実行
+        result = editor.edit_image(str(image_path), edit_instruction)
+        
+        if result and 'output_path' in result:
+            # 編集結果をセッションフォルダに移動
+            edited_filename = f"inspired_edit_{timestamp}.png"
+            edited_path = session_dir / edited_filename
+            shutil.move(result['output_path'], edited_path)
+            
+            print(f"\n✅ 存在の印象に基づく画像編集が完了しました！")
+            print(f"📁 保存場所: {edited_path}")
+            
+            # 編集情報を表示
+            if 'edit_info' in result:
+                info = result['edit_info']
+                print(f"\n📈 編集情報:")
+                print(f"   ノード活性化: {info.get('active_nodes', 'N/A')}")
+                print(f"   統合情報量Φ: {info.get('phi', 0):.3f}")
+                print(f"   世代: {info.get('generation', 1)}")
+            
+            # 編集情報を保存
+            info_path = session_dir / "inspired_edit_info.txt"
+            with open(info_path, 'w', encoding='utf-8') as f:
+                f.write(f"存在の印象に基づく現象学的編集\n")
+                f.write(f"="*50 + "\n")
+                f.write(f"日時: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                f.write(f"元画像: {image_path.name}\n")
+                f.write(f"計算モード: {computation_mode}\n")
+                f.write(f"\n存在の印象:\n{impression}\n")
+                f.write(f"\n編集指示:\n{edit_instruction}\n")
+                if 'edit_info' in result:
+                    f.write(f"\n編集結果:\n")
+                    f.write(f"  ノード活性化: {result['edit_info'].get('active_nodes', 'N/A')}\n")
+                    f.write(f"  統合情報量Φ: {result['edit_info'].get('phi', 0):.3f}\n")
+            
+            print(f"📄 編集情報を保存しました")
+            
+            # 編集された画像でさらに続行するか確認
+            continue_choice = input("\n🔄 編集された画像で現象学的分析を行いますか？ (y/n): ").strip().lower()
+            if continue_choice in ['y', 'yes', 'はい']:
+                run_oracle_system(edited_path)
+        else:
+            print("❌ 画像編集に失敗しました。")
+            
+    except Exception as e:
+        print(f"❌ エラー: {e}")
+    
+    print("\n" + "="*60)
+    print("🎨 存在の印象に基づく現象学的編集モードを終了しました")
+    print("="*60)
+
 def start_inspired_editing_mode(image_path: Path, computation_mode: str, dialogue_summary: Dict[str, Any]) -> None:
     """インスピレーションを得た存在による画像編集モード"""
     if not AdvancedPhenomenologicalImageEditor:
@@ -744,7 +963,7 @@ def start_inspired_editing_mode(image_path: Path, computation_mode: str, dialogu
         
         # 画像編集エディタを初期化
         print("\n🧠 現象学的画像編集システムを初期化中...")
-        editor = AdvancedPhenomenologicalImageEditor(api_key=api_key)
+        editor = AdvancedPhenomenologicalImageEditor()
         print("✅ 編集システムの初期化が完了しました")
         
         # 存在からの最初の編集衝動を生成
